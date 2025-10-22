@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Evaluador Python - Inicio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #059669;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 500px;
+        }
+
+        .left-side {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .left-side h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .left-side p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+        }
+
+        .features {
+            margin-top: 2rem;
+            animation: fadeInUp 0.8s ease 0.4s backwards;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+        }
+
+        .right-side {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h2 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: var(--light);
+            color: #64748b;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.3);
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .left-side {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Lado izquierdo - Información -->
+        <div class="left-side">
+            <h1>🐍 Evaluador Python con IA</h1>
+            <p>Plataforma de evaluación automatizada con inteligencia artificial adaptativa para la enseñanza de programación en Python.</p>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <span class="feature-icon">🤖</span>
+                    <div>
+                        <strong>IA Adaptativa</strong>
+                        <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Análisis inteligente de tu código</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <div>
+                        <strong>Seguimiento de Progreso</strong>
+                        <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Visualiza tu evolución</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🏆</span>
+                    <div>
+                        <strong>Sistema de Logros</strong>
+                        <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Desbloquea badges</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalEstudiantes">0</div>
+                    <div class="stat-label">Estudiantes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalEvaluaciones">0</div>
+                    <div class="stat-label">Evaluaciones</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Offline</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lado derecho - Login/Registro -->
+        <div class="right-side">
+            <div class="login-header">
+                <h2>Bienvenido</h2>
+                <p>Inicia sesión o regístrate para comenzar</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('login')">Iniciar Sesión</button>
+                <button class="tab" onclick="switchTab('register')">Registrarse</button>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <!-- Formulario de Login -->
+            <div id="loginForm" class="form-content active">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginNombre">Nombre de usuario</label>
+                        <input type="text" id="loginNombre" required placeholder="Ingresa tu nombre">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span>🚀</span>
+                        Ingresar
+                    </button>
+                </form>
+                <button class="btn btn-secondary" onclick="irProfesor()">
+                    <span>👨‍🏫</span>
+                    Acceso Profesor
+                </button>
+            </div>
+
+            <!-- Formulario de Registro -->
+            <div id="registerForm" class="form-content">
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="registerNombre">Nombre completo</label>
+                        <input type="text" id="registerNombre" required placeholder="Tu nombre completo">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span>✨</span>
+                        Crear Cuenta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cargar estadísticas al iniciar
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/estadisticas');
+                const data = await response.json();
+                document.getElementById('totalEstudiantes').textContent = data.total_estudiantes || 0;
+                document.getElementById('totalEvaluaciones').textContent = data.total_evaluaciones || 0;
+            } catch (error) {
+                console.log('Error cargando estadísticas');
+            }
+        });
+
+        function switchTab(tab) {
+            // Cambiar tabs activos
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-content').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `
+                <div class="alert alert-${type} show">
+                    ${message}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('loginNombre').value.trim();
+            
+            if (!nombre) {
+                showAlert('Por favor ingresa tu nombre', 'error');
+                return;
+            }
+
+            try {
+                // Buscar si el estudiante existe
+                const response = await fetch('/api/estudiantes');
+                const estudiantes = await response.json();
+                
+                const estudiante = estudiantes.find(e => 
+                    e.nombre.toLowerCase() === nombre.toLowerCase()
+                );
+
+                if (estudiante) {
+                    // Guardar en sessionStorage
+                    sessionStorage.setItem('estudiante_id', estudiante.id);
+                    sessionStorage.setItem('estudiante_nombre', estudiante.nombre);
+                    
+                    showAlert('¡Bienvenido de nuevo!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showAlert('Usuario no encontrado. Por favor regístrate.', 'error');
+                    switchTab('register');
+                    document.getElementById('registerNombre').value = nombre;
+                }
+            } catch (error) {
+                showAlert('Error al iniciar sesión', 'error');
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('registerNombre').value.trim();
+            
+            if (!nombre) {
+                showAlert('Por favor ingresa tu nombre', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/estudiante/registrar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre: nombre })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    if (data.estudiante_id) {
+                        showAlert('Este usuario ya existe. Iniciando sesión...', 'error');
+                        sessionStorage.setItem('estudiante_id', data.estudiante_id);
+                        sessionStorage.setItem('estudiante_nombre', nombre);
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 1500);
+                    } else {
+                        showAlert(data.error, 'error');
+                    }
+                } else {
+                    sessionStorage.setItem('estudiante_id', data.estudiante_id);
+                    sessionStorage.setItem('estudiante_nombre', data.nombre);
+                    
+                    showAlert('¡Cuenta creada exitosamente!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                }
+            } catch (error) {
+                showAlert('Error al registrarse', 'error');
+            }
+        }
+
+        function irProfesor() {
+            window.location.href = '/profesor';
+        }
+    </script>
+</body>
+</html>

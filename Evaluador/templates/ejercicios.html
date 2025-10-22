@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicios - Evaluador Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #64748b;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .ejercicios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .ejercicio-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .ejercicio-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: var(--primary);
+        }
+
+        .ejercicio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .ejercicio-id {
+            background: var(--light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .ejercicio-dificultad {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .dificultad-1, .dificultad-2 {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .dificultad-3, .dificultad-4 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .dificultad-5, .dificultad-6, .dificultad-7 {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .ejercicio-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .ejercicio-description {
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .ejercicio-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: auto;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: var(--light);
+            color: var(--error);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-template {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .pistas-list {
+            list-style: none;
+        }
+
+        .pista-item {
+            padding: 0.75rem;
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            margin-bottom: 0.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .modal-actions {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .ejercicios-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">🐍 Evaluador Python</div>
+        <div class="navbar-menu">
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/ejercicios" class="nav-link active">Ejercicios</a>
+            <a href="/" class="nav-link">Salir</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>📚 Biblioteca de Ejercicios</h1>
+            <p>Practica y mejora tus habilidades en Python</p>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filtrarNivel('todos')">
+                📖 Todos
+            </button>
+            <button class="filter-btn" onclick="filtrarNivel('principiante')">
+                🟢 Principiante
+            </button>
+            <button class="filter-btn" onclick="filtrarNivel('intermedio')">
+                🟡 Intermedio
+            </button>
+            <button class="filter-btn" onclick="filtrarNivel('avanzado')">
+                🔴 Avanzado
+            </button>
+        </div>
+
+        <div class="ejercicios-grid" id="ejerciciosContainer">
+            <div class="empty-state">
+                <div class="empty-icon">⏳</div>
+                <h3>Cargando ejercicios...</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de ejercicio -->
+    <div class="modal" id="ejercicioModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Título del Ejercicio</h2>
+                <button class="close-btn" onclick="cerrarModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="cerrarModal()">Cerrar</button>
+                <button class="btn btn-primary" onclick="copiarCodigo()">
+                    📋 Copiar Código
+                </button>
+                <button class="btn btn-primary" onclick="irAEvaluador()">
+                    💻 Ir al Evaluador
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ejerciciosTodos = {};
+        let nivelActual = 'todos';
+        let ejercicioSeleccionado = null;
+
+        async function cargarEjercicios() {
+            try {
+                const niveles = ['principiante', 'intermedio', 'avanzado'];
+                
+                for (const nivel of niveles) {
+                    const response = await fetch(`/api/ejercicios/${nivel}`);
+                    const ejercicios = await response.json();
+                    ejerciciosTodos[nivel] = ejercicios;
+                }
+
+                mostrarEjercicios('todos');
+            } catch (error) {
+                console.error('Error cargando ejercicios:', error);
+                document.getElementById('ejerciciosContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <h3>Error cargando ejercicios</h3>
+                        <p>Intenta recargar la página</p>
+                    </div>
+                `;
+            }
+        }
+
+        function filtrarNivel(nivel) {
+            nivelActual = nivel;
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            mostrarEjercicios(nivel);
+        }
+
+        function mostrarEjercicios(nivel) {
+            const container = document.getElementById('ejerciciosContainer');
+            container.innerHTML = '';
+
+            let ejerciciosAMostrar = [];
+
+            if (nivel === 'todos') {
+                Object.values(ejerciciosTodos).forEach(arr => {
+                    ejerciciosAMostrar = ejerciciosAMostrar.concat(arr);
+                });
+            } else {
+                ejerciciosAMostrar = ejerciciosTodos[nivel] || [];
+            }
+
+            if (ejerciciosAMostrar.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No hay ejercicios disponibles</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            ejerciciosAMostrar.forEach(ejercicio => {
+                const card = crearTarjetaEjercicio(ejercicio);
+                container.appendChild(card);
+            });
+        }
+
+        function crearTarjetaEjercicio(ejercicio) {
+            const card = document.createElement('div');
+            card.className = 'ejercicio-card';
+            card.onclick = () => abrirEjercicio(ejercicio);
+
+            const dificultadClass = `dificultad-${ejercicio.dificultad || 1}`;
+            const dificultadTexto = ejercicio.dificultad <= 2 ? 'Fácil' : 
+                                    ejercicio.dificultad <= 4 ? 'Medio' : 'Difícil';
+
+            card.innerHTML = `
+                <div class="ejercicio-header">
+                    <span class="ejercicio-id">${ejercicio.id.toUpperCase()}</span>
+                    <span class="ejercicio-dificultad ${dificultadClass}">${dificultadTexto}</span>
+                </div>
+                <h3 class="ejercicio-title">${ejercicio.titulo}</h3>
+                <p class="ejercicio-description">${ejercicio.descripcion}</p>
+                <div class="ejercicio-meta">
+                    <div class="meta-item">
+                        <span>🎯</span>
+                        <span>${ejercicio.puntos || 10} puntos</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>💡</span>
+                        <span>${ejercicio.pistas ? ejercicio.pistas.length : 0} pistas</span>
+                    </div>
+                    <button class="btn-primary" onclick="event.stopPropagation(); abrirEjercicio(${JSON.stringify(ejercicio).replace(/"/g, '&quot;')})">
+                        Ver Ejercicio →
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function abrirEjercicio(ejercicio) {
+            ejercicioSeleccionado = ejercicio;
+            
+            document.getElementById('modalTitle').textContent = ejercicio.titulo;
+            
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="section">
+                    <div class="section-title">📋 Descripción</div>
+                    <p>${ejercicio.descripcion}</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">💻 Código Plantilla</div>
+                    <div class="code-template">${ejercicio.codigo_plantilla}</div>
+                </div>
+
+                ${ejercicio.pistas && ejercicio.pistas.length > 0 ? `
+                    <div class="section">
+                        <div class="section-title">💡 Pistas</div>
+                        <ul class="pistas-list">
+                            ${ejercicio.pistas.map(pista => `
+                                <li class="pista-item">${pista}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                ${ejercicio.tests && ejercicio.tests.length > 0 ? `
+                    <div class="section">
+                        <div class="section-title">✅ Casos de Prueba</div>
+                        <p style="color: #64748b;">Tu solución debe pasar estos tests:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #64748b;">
+                            ${ejercicio.tests.map(test => `
+                                <li>${test.descripcion || `Input: ${JSON.stringify(test.input)} → Output: ${JSON.stringify(test.output)}`}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                <div class="section">
+                    <div class="section-title">🎯 Puntos</div>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">
+                        ${ejercicio.puntos || 10} puntos
+                    </p>
+                </div>
+            `;
+
+            document.getElementById('ejercicioModal').classList.add('show');
+        }
+
+        function cerrarModal() {
+            document.getElementById('ejercicioModal').classList.remove('show');
+        }
+
+        function copiarCodigo() {
+            if (!ejercicioSeleccionado) return;
+
+            const codigo = ejercicioSeleccionado.codigo_plantilla;
+            navigator.clipboard.writeText(codigo).then(() => {
+                alert('✅ Código copiado al portapapeles');
+            }).catch(() => {
+                alert('❌ Error al copiar el código');
+            });
+        }
+
+        function irAEvaluador() {
+            if (!ejercicioSeleccionado) return;
+            
+            // Guardar código en sessionStorage
+            sessionStorage.setItem('codigo_ejercicio', ejercicioSeleccionado.codigo_plantilla);
+            sessionStorage.setItem('ejercicio_id', ejercicioSeleccionado.id);
+            
+            // Redirigir al evaluador
+            window.location.href = '/evaluador';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('ejercicioModal').addEventListener('click', (e) => {
+            if (e.target.id === 'ejercicioModal') {
+                cerrarModal();
+            }
+        });
+
+        // Cargar ejercicios al iniciar
+        cargarEjercicios();
+    </script>
+</body>
+</html>

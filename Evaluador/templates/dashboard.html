@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Evaluador Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: var(--light);
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-section p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--light);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            transition: width 0.5s ease;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .badge-item.unlocked {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-item.locked {
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+
+        .badge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            padding: 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .action-btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+        }
+
+        .action-btn-secondary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #047857 100%);
+        }
+
+        .action-btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #b45309 100%);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .action-icon {
+            font-size: 1.8rem;
+        }
+
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .activity-list {
+            margin-top: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .activity-icon-success { background: #d1fae5; color: var(--secondary); }
+        .activity-icon-warning { background: #fef3c7; color: var(--warning); }
+        .activity-icon-info { background: #dbeafe; color: var(--primary); }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            🐍 Evaluador Python
+        </div>
+        <div class="navbar-menu">
+            <a href="/dashboard" class="nav-link active">Dashboard</a>
+            <a href="/ejercicios" class="nav-link">Ejercicios</a>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <div>
+                    <div style="font-weight: 600;" id="userName">Cargando...</div>
+                    <div style="font-size: 0.8rem; color: #64748b;" id="userLevel">Nivel: ...</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Sección de bienvenida -->
+        <div class="welcome-section">
+            <h1 id="welcomeTitle">¡Bienvenido de nuevo!</h1>
+            <p>Continúa tu camino en el aprendizaje de Python</p>
+            <span class="level-badge" id="levelBadge">📊 Cargando nivel...</span>
+        </div>
+
+        <!-- Estadísticas principales -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Evaluaciones</span>
+                    <span class="card-icon">📝</span>
+                </div>
+                <div class="stat-value" id="totalEvaluaciones">0</div>
+                <div class="stat-label">Códigos evaluados</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Puntuación</span>
+                    <span class="card-icon">⭐</span>
+                </div>
+                <div class="stat-value" id="scorePromedio">0</div>
+                <div class="stat-label">Promedio general</div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Progreso</span>
+                        <span id="scorePercentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="scoreProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Badges</span>
+                    <span class="card-icon">🏆</span>
+                </div>
+                <div class="stat-value" id="badgesCount">0</div>
+                <div class="stat-label">Logros desbloqueados</div>
+            </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">Acciones Rápidas</h2>
+            <div class="quick-actions">
+                <a href="/ejercicios" class="action-btn action-btn-primary">
+                    <span class="action-icon">📚</span>
+                    <div>
+                        <div>Ver Ejercicios</div>
+                        <div style="font-size: 0.85rem; opacity: 0.9;">Practica con ejemplos</div>
+                    </div>
+                </a>
+                <a href="/evaluador" class="action-btn action-btn-secondary">
+                    <span class="action-icon">💻</span>
+                    <div>
+                        <div>Evaluar Código</div>
+                        <div style="font-size: 0.85rem; opacity: 0.9;">Prueba tu código ahora</div>
+                    </div>
+                </a>
+                <button onclick="verProgreso()" class="action-btn action-btn-warning">
+                    <span class="action-icon">📊</span>
+                    <div>
+                        <div>Mi Progreso</div>
+                        <div style="font-size: 0.85rem; opacity: 0.9;">Estadísticas detalladas</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Badges obtenidos -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-header">
+                    <span class="card-title">🏆 Mis Logros</span>
+                </div>
+                <div class="badges-grid" id="badgesContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Cargando badges...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actividad reciente -->
+            <div class="recent-activity">
+                <h3 class="card-title">Actividad Reciente</h3>
+                <div class="activity-list" id="activityList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Cargando actividad...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar sesión
+        const estudianteId = sessionStorage.getItem('estudiante_id');
+        const estudianteNombre = sessionStorage.getItem('estudiante_nombre');
+
+        if (!estudianteId) {
+            window.location.href = '/';
+        }
+
+        // Cargar datos del estudiante
+	async function cargarDatos() {
+	    try {
+	        const response = await fetch(`/api/estudiante/${estudianteId}/progreso`);
+        
+	        // Verificar si la respuesta es válida
+	        if (!response.ok) {
+	            throw new Error(`HTTP ${response.status}`);
+	        }
+        
+	        const data = await response.json();
+
+	        // Si hay error pero podemos recuperar
+	        if (data.error) {
+	            console.warn('Advertencia:', data.error);
+	            // Usar valores por defecto en lugar de redirigir
+	            mostrarDatosDefecto();
+	            return;
+	        }
+
+	        // Verificar estructura mínima de datos
+	        const estudiante = data.estudiante || {};
+	        const progreso = data.progreso || {};
+
+	        // Actualizar interfaz con valores seguros
+	        document.getElementById('userName').textContent = estudiante.nombre || estudianteNombre || 'Usuario';
+	        document.getElementById('userAvatar').textContent = (estudiante.nombre || estudianteNombre || 'U').charAt(0).toUpperCase();
+	        document.getElementById('welcomeTitle').textContent = `¡Hola, ${estudiante.nombre || estudianteNombre || 'Usuario'}!`;
+        
+	        const nivel = progreso.nivel_actual || 'principiante';
+	        document.getElementById('userLevel').textContent = `Nivel: ${nivel}`;
+	        document.getElementById('levelBadge').textContent = `📊 Nivel ${nivel}`;
+
+	        // Estadísticas
+	        document.getElementById('totalEvaluaciones').textContent = progreso.evaluaciones_totales || 0;
+	        document.getElementById('scorePromedio').textContent = Math.round(progreso.score_promedio || 0);
+	        document.getElementById('scorePercentage').textContent = `${Math.round(progreso.score_promedio || 0)}%`;
+	        document.getElementById('scoreProgress').style.width = `${progreso.score_promedio || 0}%`;
+
+	        // Cargar badges (con manejo de error)
+	        try {
+	            await cargarBadges();
+	        } catch (e) {
+	            console.error('Error cargando badges:', e);
+	        }
+
+	        // Cargar actividad
+	        cargarActividad(data.historial_reciente || []);
+
+	    } catch (error) {
+	        console.error('Error cargando datos:', error);
+	        // Mostrar datos por defecto en lugar de redirigir
+	        mostrarDatosDefecto();
+	    }
+	}
+
+	function mostrarDatosDefecto() {
+	    // Mostrar interfaz básica con datos por defecto
+	    document.getElementById('userName').textContent = estudianteNombre || 'Usuario';
+	    document.getElementById('userAvatar').textContent = (estudianteNombre || 'U').charAt(0).toUpperCase();
+	    document.getElementById('welcomeTitle').textContent = `¡Hola, ${estudianteNombre || 'Usuario'}!`;
+	    document.getElementById('userLevel').textContent = 'Nivel: principiante';
+	    document.getElementById('levelBadge').textContent = '📊 Nivel principiante';
+    
+	    document.getElementById('totalEvaluaciones').textContent = '0';
+	    document.getElementById('scorePromedio').textContent = '0';
+	    document.getElementById('scorePercentage').textContent = '0%';
+	    document.getElementById('scoreProgress').style.width = '0%';
+	    document.getElementById('badgesCount').textContent = '0';
+    
+	    // Mensaje informativo
+	    const activityList = document.getElementById('activityList');
+	    activityList.innerHTML = `
+	        <div style="text-align: center; padding: 2rem; color: #64748b;">
+	            <p>👋 Bienvenido! Comienza evaluando tu primer código.</p>
+	            <p style="margin-top: 1rem;">
+	                <a href="/evaluador" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+	                    💻 Ir al Evaluador →
+	                </a>
+	            </p>
+	        </div>
+	    `;
+	}
+
+	async function cargarBadges() {
+	    try {
+	        const response = await fetch(`/api/estudiante/${estudianteId}/badges`);
+        
+	        if (!response.ok) {
+	            throw new Error('Error cargando badges');
+	        }
+        
+	        const data = await response.json();
+        
+	        const badgesObtenidos = data.badges || [];
+	        document.getElementById('badgesCount').textContent = badgesObtenidos.length;
+
+	        // Obtener todos los badges disponibles
+	        const todosResponse = await fetch('/api/badges/todos');
+        
+	        if (!todosResponse.ok) {
+	            throw new Error('Error cargando lista de badges');
+	        }
+        
+	        const todosData = await todosResponse.json();
+	        const todosBadges = todosData.badges || [];
+
+	        const container = document.getElementById('badgesContainer');
+	        container.innerHTML = '';
+
+	        if (todosBadges.length === 0) {
+	            container.innerHTML = '<p style="text-align: center; color: #64748b;">Sistema de badges en preparación</p>';
+	            return;
+	        }
+
+	        todosBadges.forEach(badge => {
+	            const obtenido = badgesObtenidos.some(b => b.id === badge.id);
+	            const badgeEl = document.createElement('div');
+	            badgeEl.className = `badge-item ${obtenido ? 'unlocked' : 'locked'}`;
+	            badgeEl.title = badge.descripcion;
+	            badgeEl.innerHTML = `
+	                <div class="badge-icon">${badge.icono}</div>
+	                <div class="badge-name">${badge.nombre}</div>
+	            `;
+	            container.appendChild(badgeEl);
+	        });
+
+	    } catch (error) {
+	        console.error('Error cargando badges:', error);
+	        document.getElementById('badgesContainer').innerHTML = 
+	            '<p style="text-align: center; color: #64748b;">Badges no disponibles temporalmente</p>';
+	    }
+	}
+
+        function cargarActividad(historial) {
+            const container = document.getElementById('activityList');
+            container.innerHTML = '';
+
+            if (!historial || historial.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">Sin actividad reciente</p>';
+                return;
+            }
+
+            historial.slice(0, 5).forEach(item => {
+                const activityEl = document.createElement('div');
+                activityEl.className = 'activity-item';
+                
+                const iconClass = item.score >= 70 ? 'success' : item.score >= 50 ? 'warning' : 'info';
+                const icon = item.score >= 70 ? '✅' : item.score >= 50 ? '⚠️' : 'ℹ️';
+                
+                activityEl.innerHTML = `
+                    <div class="activity-icon-circle activity-icon-${iconClass}">
+                        ${icon}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Evaluación - Score: ${item.score}%</div>
+                        <div class="activity-time">Nivel: ${item.nivel} - ${new Date(item.fecha).toLocaleDateString()}</div>
+                    </div>
+                `;
+                container.appendChild(activityEl);
+            });
+        }
+
+        function verProgreso() {
+            alert('Función de progreso detallado próximamente');
+        }
+
+        // Cargar datos al iniciar
+        cargarDatos();
+    </script>
+</body>
+</html>

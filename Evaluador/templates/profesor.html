@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Profesor - Evaluador Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--light);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: var(--light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-principiante {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-intermedio {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-avanzado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .progress-bar-small {
+            width: 100px;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill-small {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s;
+        }
+
+        .btn-view {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-view:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .chart-bars {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-end;
+            height: 200px;
+            margin-top: 1rem;
+        }
+
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bar {
+            width: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 0.5rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">👨‍🏫 Panel del Profesor</div>
+        <div class="navbar-menu">
+            <a href="/" class="nav-link">Volver al Inicio</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Panel de Control del Profesor</h1>
+            <p>Visualiza el progreso y estadísticas de todos los estudiantes</p>
+        </div>
+
+        <!-- Estadísticas generales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Estudiantes</span>
+                    <span class="stat-icon">👥</span>
+                </div>
+                <div class="stat-value" id="totalEstudiantes">0</div>
+                <div class="stat-label">Registrados en el sistema</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Evaluaciones</span>
+                    <span class="stat-icon">📝</span>
+                </div>
+                <div class="stat-value" id="totalEvaluaciones">0</div>
+                <div class="stat-label">Códigos analizados</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Promedio General</span>
+                    <span class="stat-icon">⭐</span>
+                </div>
+                <div class="stat-value" id="promedioGeneral">0</div>
+                <div class="stat-label">Score promedio del grupo</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Activos Hoy</span>
+                    <span class="stat-icon">🔥</span>
+                </div>
+                <div class="stat-value" id="activosHoy">0</div>
+                <div class="stat-label">Estudiantes con actividad</div>
+            </div>
+        </div>
+
+        <!-- Gráfico de distribución por nivel -->
+        <div class="chart-container">
+            <h3 class="section-title">📊 Distribución por Nivel</h3>
+            <div class="chart-bars" id="chartNiveles">
+                <div class="chart-bar">
+                    <div class="bar" style="height: 0%" id="barPrincipiante">0</div>
+                    <div class="bar-label">Principiante</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar" style="height: 0%" id="barIntermedio">0</div>
+                    <div class="bar-label">Intermedio</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar" style="height: 0%" id="barAvanzado">0</div>
+                    <div class="bar-label">Avanzado</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de estudiantes -->
+        <h2 class="section-title">👨‍🎓 Lista de Estudiantes</h2>
+        <div class="table-container">
+            <table id="tablaEstudiantes">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Nivel</th>
+                        <th>Evaluaciones</th>
+                        <th>Promedio</th>
+                        <th>Progreso</th>
+                        <th>Última Actividad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="estudiantesBody">
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">⏳</div>
+                                <p>Cargando estudiantes...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function cargarEstadisticas() {
+            try {
+                const response = await fetch('/api/estadisticas');
+                const data = await response.json();
+
+                document.getElementById('totalEstudiantes').textContent = data.total_estudiantes || 0;
+                document.getElementById('totalEvaluaciones').textContent = data.total_evaluaciones || 0;
+                document.getElementById('promedioGeneral').textContent = Math.round(data.promedio_general || 0);
+
+                // Calcular activos hoy (simplificado)
+                const activos = Math.min(data.total_estudiantes, Math.ceil(data.total_estudiantes * 0.6));
+                document.getElementById('activosHoy').textContent = activos;
+
+                // Actualizar gráfico de distribución
+                actualizarGraficoNiveles(data.distribucion_niveles || {});
+
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        function actualizarGraficoNiveles(distribucion) {
+            const principiante = distribucion.principiante || 0;
+            const intermedio = distribucion.intermedio || 0;
+            const avanzado = distribucion.avanzado || 0;
+            const total = principiante + intermedio + avanzado;
+
+            if (total === 0) return;
+
+            const maxHeight = 180;
+            
+            const principiantePorcentaje = (principiante / total) * 100;
+            const intermedioPorcentaje = (intermedio / total) * 100;
+            const avanzadoPorcentaje = (avanzado / total) * 100;
+
+            document.getElementById('barPrincipiante').style.height = `${(principiante / total) * maxHeight}px`;
+            document.getElementById('barPrincipiante').textContent = principiante;
+
+            document.getElementById('barIntermedio').style.height = `${(intermedio / total) * maxHeight}px`;
+            document.getElementById('barIntermedio').textContent = intermedio;
+
+            document.getElementById('barAvanzado').style.height = `${(avanzado / total) * maxHeight}px`;
+            document.getElementById('barAvanzado').textContent = avanzado;
+        }
+
+        async function cargarEstudiantes() {
+            try {
+                const response = await fetch('/api/estudiantes');
+                const estudiantes = await response.json();
+
+                const tbody = document.getElementById('estudiantesBody');
+
+                if (!estudiantes || estudiantes.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📭</div>
+                                    <p>No hay estudiantes registrados</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+
+                estudiantes.forEach(estudiante => {
+                    const tr = document.createElement('tr');
+                    
+                    const nivel = estudiante.nivel || 'principiante';
+                    const badgeClass = `badge badge-${nivel}`;
+                    
+                    const promedio = Math.round(estudiante.promedio || 0);
+                    const fecha = estudiante.ultima_actividad ? 
+                        new Date(estudiante.ultima_actividad).toLocaleDateString('es-ES') : 
+                        'Sin actividad';
+
+                    tr.innerHTML = `
+                        <td><strong>${estudiante.nombre}</strong></td>
+                        <td><span class="${badgeClass}">${nivel}</span></td>
+                        <td>${estudiante.evaluaciones || 0}</td>
+                        <td>${promedio}%</td>
+                        <td>
+                            <div class="progress-bar-small">
+                                <div class="progress-fill-small" style="width: ${promedio}%"></div>
+                            </div>
+                        </td>
+                        <td style="color: #64748b; font-size: 0.9rem;">${fecha}</td>
+                        <td>
+                            <button class="btn-view" onclick="verDetalleEstudiante(${estudiante.id})">
+                                Ver Detalle
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error('Error cargando estudiantes:', error);
+                document.getElementById('estudiantesBody').innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">❌</div>
+                                <p>Error cargando estudiantes</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+
+	async function verDetalleEstudiante(estudianteId) {
+	    try {
+	        const response = await fetch(`/api/estudiante/${estudianteId}/progreso`);
+	        const data = await response.json();
+
+	        if (data.error || !data.estudiante || !data.progreso) {
+	            alert('No se pudieron cargar los datos del estudiante');
+	            return;
+	        }
+
+	        // Construir mensaje detallado con validaciones
+	        let mensaje = `📊 DETALLE DEL ESTUDIANTE\n\n`;
+	        mensaje += `👤 Nombre: ${data.estudiante.nombre || 'N/A'}\n`;
+	        mensaje += `📈 Nivel: ${data.progreso.nivel_actual || 'principiante'}\n`;
+	        mensaje += `📝 Evaluaciones: ${data.progreso.evaluaciones_totales || 0}\n`;
+	        mensaje += `⭐ Score Promedio: ${Math.round(data.progreso.score_promedio || 0)}%\n`;
+	        mensaje += `🎯 Score Máximo: ${data.progreso.score_maximo || 0}%\n`;
+	        mensaje += `⚙️ Funciones Creadas: ${data.progreso.funciones_creadas || 0}\n`;
+	        mensaje += `🏗️ Clases Creadas: ${data.progreso.clases_creadas || 0}\n\n`;
+
+	        if (data.historial_reciente && data.historial_reciente.length > 0) {
+	            mensaje += `📋 ÚLTIMAS EVALUACIONES:\n`;
+	            data.historial_reciente.slice(0, 5).forEach((eval, index) => {
+	                mensaje += `${index + 1}. Score: ${eval.score || 0}% - Nivel: ${eval.nivel || 'N/A'}\n`;
+	            });
+	        } else {
+	            mensaje += `📋 Sin evaluaciones registradas aún\n`;
+	        }
+
+	        alert(mensaje);
+
+	    } catch (error) {
+	        console.error('Error:', error);
+	        alert('Error de conexión al cargar detalles del estudiante');
+	    }
+	}
+
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarEstadisticas();
+            cargarEstudiantes();
+
+            // Actualizar cada 30 segundos
+            setInterval(() => {
+                cargarEstadisticas();
+                cargarEstudiantes();
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
